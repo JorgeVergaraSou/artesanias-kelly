@@ -6,11 +6,21 @@ export default function Navbar() {
   return (
     <AppBar position="static" color="primary">
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            flexGrow: 1,
+            fontFamily: "'Style Script', cursive",
+            fontSize: "2rem", // Podés ajustar el tamaño aquí
+          }}
+        >
           Artesanías Kelly
         </Typography>
+
+
+
         <Box>
-          <Button color="inherit" component={RouterLink} to="/">
+          <Button  color="inherit" component={RouterLink} to="/">
             Inicio
           </Button>
           <Button color="inherit" component={RouterLink} to="/nosotros">
