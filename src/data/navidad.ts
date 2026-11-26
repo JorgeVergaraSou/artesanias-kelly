@@ -19,7 +19,7 @@ const BASE = "/img/navidad";
 
 /** Arma la ruta codificando espacios y caracteres especiales del nombre de archivo. */
 const ruta = (carpeta: string, archivo: string) =>
-  `${BASE}/${carpeta}/${encodeURIComponent(archivo)}`.replace("//", "/");
+  `${BASE}/${carpeta}/${encodeURIComponent(archivo)}`;
 
 const introComun = [
   "La Navidad es tiempo de unión: de sentarse a la misma mesa, de abrazarse fuerte y de recordar lo que realmente importa. Es la ocasión de agradecer por quienes están a nuestro lado y de compartir lo que tenemos, sea mucho o poco.",
@@ -27,7 +27,7 @@ const introComun = [
   "Te invitamos a conocer nuestras creaciones de esta temporada y a elegir ese detalle especial que haga única tu Navidad.",
 ];
 
-// Las fotos de 2026 están sueltas en /public/img/navidad/ (carpeta "").
+// Las fotos de 2026 viven en /public/img/navidad/2026/.
 const archivos2026 = [
   "WhatsApp Image 2026-11-26 at 10.25.20.jpeg",
   "WhatsApp Image 2026-11-26 at 10.25.21.jpeg",
@@ -58,11 +58,11 @@ export const edicionesNavidad: EdicionNavidad[] = [
     titulo: "Navidad 2026",
     introduccion: introComun,
     portada: {
-      src: `${BASE}/Portada.jpeg`,
+      src: ruta("2026", "Portada.jpeg"),
       alt: "Collage de adornos navideños artesanales: casitas con luces, arbolitos, faroles, cajas de regalo y canastos decorados",
     },
     fotos: archivos2026.map((archivo, i) => ({
-      src: ruta("", archivo),
+      src: ruta("2026", archivo),
       alt: `Adorno navideño hecho a mano, foto ${i + 1}`,
     })),
   },
