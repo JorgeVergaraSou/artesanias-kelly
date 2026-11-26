@@ -1,11 +1,10 @@
 // components/WhatsAppButton.tsx
 import { Fab } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { buildWhatsAppLink } from "../data/whatsapp";
 
 const WhatsAppButton = () => {
-  const phoneNumber = "56954957090"; // cambia este número
-  const message = "Hola, estoy interesado en tus productos...";
-  const link = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  const link = buildWhatsAppLink("Hola, estoy interesado en tus productos...");
 
   return (
     <Fab
