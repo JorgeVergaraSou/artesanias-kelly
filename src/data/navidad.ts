@@ -6,12 +6,20 @@ export interface FotoNavidad {
   alt: string;
 }
 
+export interface LugarNavidad {
+  nombre: string;
+  direccion: string;
+}
+
 export interface EdicionNavidad {
   anio: number;
   titulo: string;
   /** Párrafos del texto introductorio */
   introduccion: string[];
   portada: FotoNavidad;
+  /** Opcional: si no hay invitación ni lugar, ese bloque no se muestra. */
+  invitacion?: FotoNavidad;
+  lugar?: LugarNavidad;
   fotos: FotoNavidad[];
 }
 
@@ -60,6 +68,14 @@ export const edicionesNavidad: EdicionNavidad[] = [
     portada: {
       src: ruta("2026", "Portada.jpeg"),
       alt: "Collage de adornos navideños artesanales: casitas con luces, arbolitos, faroles, cajas de regalo y canastos decorados",
+    },
+    invitacion: {
+      src: ruta("2026", "invitacion.jpeg"),
+      alt: "Invitación a la Feria Navideña organizada por la Junta Vecinal 23 de Abril N° 17 y la Agrupación de Emprendedores Los Recoletos, en la Explanada Metro Dorsal",
+    },
+    lugar: {
+      nombre: "Explanada Metro Dorsal",
+      direccion: "Explanada Metro Dorsal, Recoleta, Chile",
     },
     fotos: archivos2026.map((archivo, i) => ({
       src: ruta("2026", archivo),

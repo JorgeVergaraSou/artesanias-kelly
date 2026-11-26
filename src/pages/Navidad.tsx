@@ -7,7 +7,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { buscarEdicion, edicionMasReciente } from "../data/navidad";
+import PlaceIcon from "@mui/icons-material/Place";
+import {
+  buscarEdicion,
+  edicionMasReciente,
+  type EdicionNavidad,
+} from "../data/navidad";
 import { buildWhatsAppLink } from "../data/whatsapp";
 import { DORADO, CREMA } from "../theme/navidad";
 
@@ -101,6 +106,110 @@ function Guirnalda() {
   );
 }
 
+function BloqueInvitacion({
+  invitacion,
+  lugar,
+  onAmpliar,
+}: {
+  invitacion: NonNullable<EdicionNavidad["invitacion"]>;
+  lugar: NonNullable<EdicionNavidad["lugar"]>;
+  onAmpliar: () => void;
+}) {
+  const direccion = encodeURIComponent(lugar.direccion);
+  return (
+    <Box sx={{ pt: { xs: 1, md: 3 }, pb: { xs: 2, md: 4 } }}>
+      <Box textAlign="center" mb={3}>
+        <TituloDorado>Te invitamos a celebrar con nosotros</TituloDorado>
+      </Box>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "minmax(260px, 5fr) 6fr" },
+          gap: { xs: 3, md: 5 },
+          alignItems: "start",
+        }}
+      >
+        <Box
+          component="button"
+          type="button"
+          onClick={onAmpliar}
+          aria-label="Ampliar la invitación"
+          sx={{
+            p: 0,
+            border: `4px solid ${DORADO}`,
+            borderRadius: 3,
+            overflow: "hidden",
+            cursor: "zoom-in",
+            bgcolor: "transparent",
+            display: "block",
+            width: "100%",
+            maxWidth: { xs: 420, md: "none" },
+            mx: "auto",
+            boxShadow: `0 0 28px rgba(230,184,76,0.35), 0 12px 28px rgba(0,0,0,0.45)`,
+            transition: "transform .25s ease",
+            "&:hover, &:focus-visible": { transform: "scale(1.02)", outline: "none" },
+          }}
+        >
+          <Box
+            component="img"
+            src={invitacion.src}
+            alt={invitacion.alt}
+            sx={{ display: "block", width: "100%", height: "auto" }}
+          />
+        </Box>
+
+        <Box>
+          <Box
+            component="iframe"
+            src={`https://www.google.com/maps?q=${direccion}&output=embed`}
+            title={`Mapa de ${lugar.nombre}`}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+            sx={{
+              display: "block",
+              width: "100%",
+              height: { xs: 280, md: 420 },
+              border: `3px solid ${DORADO}`,
+              borderRadius: 3,
+              boxShadow: "0 8px 22px rgba(0,0,0,0.45)",
+            }}
+          />
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: { xs: "center", md: "space-between" },
+              gap: 2,
+              textAlign: { xs: "center", md: "left" },
+            }}
+          >
+            <Box>
+              <Typography sx={{ fontWeight: 700, color: DORADO, fontSize: "1.1rem" }}>
+                {lugar.nombre}
+              </Typography>
+              <Typography>{lugar.direccion}</Typography>
+            </Box>
+            <Button
+              variant="contained"
+              color="warning"
+              href={`https://www.google.com/maps/search/?api=1&query=${direccion}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              startIcon={<PlaceIcon />}
+              sx={{ borderRadius: 8, px: 3, fontWeight: 700 }}
+            >
+              Cómo llegar
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
 function TituloDorado({ children, size = "3rem" }: { children: string; size?: string }) {
   return (
     <Typography
@@ -121,7 +230,8 @@ function TituloDorado({ children, size = "3rem" }: { children: string; size?: st
 export default function Navidad() {
   const { anio } = useParams();
   const edicion = buscarEdicion(anio);
-  const [abierta, setAbierta] = useState<number | null>(null);
+  // Visor: índice de la galería, "invitacion", o null (cerrado).
+  const [abierta, setAbierta] = useState<number | "invitacion" | null>(null);
 
   if (!edicion) {
     return (
@@ -143,10 +253,14 @@ export default function Navidad() {
     );
   }
 
-  const { fotos } = edicion;
-  const foto = abierta !== null ? fotos[abierta] : null;
+  const { fotos, invitacion, lugar } = edicion;
+  const esInvitacion = abierta === "invitacion";
+  const foto =
+    abierta === null ? null : esInvitacion ? (invitacion ?? null) : fotos[abierta];
   const mover = (d: number) =>
-    setAbierta((i) => (i === null ? i : (i + d + fotos.length) % fotos.length));
+    setAbierta((i) =>
+      typeof i === "number" ? (i + d + fotos.length) % fotos.length : i
+    );
 
   const mensaje = `Hola, quiero encargar un regalo de Navidad ${edicion.anio}.`;
 
@@ -159,6 +273,14 @@ export default function Navidad() {
         maxWidth="lg"
         sx={{ position: "relative", zIndex: 1, color: CREMA, pt: 2, pb: 8 }}
       >
+        {invitacion && lugar && (
+          <BloqueInvitacion
+            invitacion={invitacion}
+            lugar={lugar}
+            onAmpliar={() => setAbierta("invitacion")}
+          />
+        )}
+
         {/* HERO */}
         <Box
           sx={{
@@ -323,6 +445,8 @@ export default function Navidad() {
             >
               <CloseIcon />
             </IconButton>
+            {!esInvitacion && (
+              <>
             <IconButton
               aria-label="Foto anterior"
               onClick={() => mover(-1)}
@@ -349,6 +473,8 @@ export default function Navidad() {
             >
               <ChevronRightIcon />
             </IconButton>
+              </>
+            )}
           </Box>
         )}
       </Dialog>
