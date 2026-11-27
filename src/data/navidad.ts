@@ -11,16 +11,25 @@ export interface LugarNavidad {
   direccion: string;
 }
 
+export interface GaleriaNavidad {
+  id: string;
+  titulo: string;
+  /** Se muestra primero (foto grande inicial y primera miniatura). */
+  portada: FotoNavidad;
+  /** Las demás fotos, sin repetir la portada. */
+  fotos: FotoNavidad[];
+}
+
 export interface EdicionNavidad {
   anio: number;
   titulo: string;
   /** Párrafos del texto introductorio */
   introduccion: string[];
-  portada: FotoNavidad;
+  /** Galerías en el orden en que se muestran en la página. */
+  galerias: GaleriaNavidad[];
   /** Opcional: si no hay invitación ni lugar, ese bloque no se muestra. */
   invitacion?: FotoNavidad;
   lugar?: LugarNavidad;
-  fotos: FotoNavidad[];
 }
 
 const BASE = "/img/navidad";
@@ -35,8 +44,19 @@ const introComun = [
   "Te invitamos a conocer nuestras creaciones de esta temporada y a elegir ese detalle especial que haga única tu Navidad.",
 ];
 
-// Las fotos de 2026 viven en /public/img/navidad/2026/.
-const archivos2026 = [
+/** Arma una lista de fotos con texto alternativo genérico numerado. */
+const fotos = (
+  carpeta: string,
+  archivos: string[],
+  descripcion: string
+): FotoNavidad[] =>
+  archivos.map((archivo, i) => ({
+    src: ruta(carpeta, archivo),
+    alt: `${descripcion}, foto ${i + 1}`,
+  }));
+
+// Adornos: fotos sueltas en /public/img/navidad/2026/ (sin la portada ni la invitación).
+const adornos2026 = [
   "WhatsApp Image 2026-11-26 at 10.25.20.jpeg",
   "WhatsApp Image 2026-11-26 at 10.25.21.jpeg",
   "WhatsApp Image 2026-11-26 at 10.25.23.jpeg",
@@ -60,15 +80,44 @@ const archivos2026 = [
   "WhatsApp Image 2026-11-26 at 10.25.36.jpeg",
 ];
 
+// Coronas: en /public/img/navidad/2026/coronas/ (sin la portada corona_portada.jpeg).
+const coronas2026 = [
+  "coronas (1).jpeg",
+  "coronas (2).jpeg",
+  "coronas (3).jpeg",
+  "coronas (4).jpeg",
+  "coronas (5).jpeg",
+  "coronas (6).jpeg",
+  "coronas (7).jpeg",
+  "coronas (8).jpeg",
+  "coronas (9).jpeg",
+];
+
 export const edicionesNavidad: EdicionNavidad[] = [
   {
     anio: 2026,
     titulo: "Navidad 2026",
     introduccion: introComun,
-    portada: {
-      src: ruta("2026", "Portada.jpeg"),
-      alt: "Collage de adornos navideños artesanales: casitas con luces, arbolitos, faroles, cajas de regalo y canastos decorados",
-    },
+    galerias: [
+      {
+        id: "adornos",
+        titulo: "Adornos navideños",
+        portada: {
+          src: ruta("2026", "Portada.jpeg"),
+          alt: "Collage de adornos navideños artesanales: casitas con luces, arbolitos, faroles, cajas de regalo y canastos decorados",
+        },
+        fotos: fotos("2026", adornos2026, "Adorno navideño hecho a mano"),
+      },
+      {
+        id: "coronas",
+        titulo: "Coronas",
+        portada: {
+          src: ruta("2026/coronas", "corona_portada.jpeg"),
+          alt: "Corona navideña hecha a mano",
+        },
+        fotos: fotos("2026/coronas", coronas2026, "Corona navideña hecha a mano"),
+      },
+    ],
     invitacion: {
       src: ruta("2026", "invitacion.jpeg"),
       alt: "Invitación a la Feria Navideña organizada por la Junta Vecinal 23 de Abril N° 17 y la Agrupación de Emprendedores Los Recoletos, en la Explanada Metro Dorsal",
@@ -77,16 +126,13 @@ export const edicionesNavidad: EdicionNavidad[] = [
       nombre: "Explanada Metro Dorsal",
       direccion: "Explanada Metro Dorsal, Recoleta, Chile",
     },
-    fotos: archivos2026.map((archivo, i) => ({
-      src: ruta("2026", archivo),
-      alt: `Adorno navideño hecho a mano, foto ${i + 1}`,
-    })),
   },
 
   // CÓMO AGREGAR 2027:
-  // 1. Crea la carpeta public/img/navidad/2027/ y deja ahí la portada y las fotos.
-  // 2. Copia el bloque de 2026 arriba, cambia anio/titulo, y usa
-  //    ruta("2027", "nombre.jpeg") para cada foto.
+  // 1. Crea public/img/navidad/2027/ (y una subcarpeta por galería, ej. 2027/coronas/).
+  // 2. Copia el bloque de 2026 arriba, cambia anio/titulo y, en cada galería,
+  //    usa ruta("2027", "archivo.jpeg") y fotos("2027", [...], "descripción").
+  // Para una galería nueva en un año: agrega otro objeto a "galerias".
   // El menú de la barra y la ruta /navidad/2027 se crean solos.
 ];
 
